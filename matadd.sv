@@ -15,8 +15,8 @@ generate
 		for (j = 0; j < csize; j = j + 1) begin : col
 			add fa
 			(
-				.in1(in1[i][j]),
-				.in2(in2[i][j]),
+				.a(in1[i][j]),
+				.b(in2[i][j]),
 				.clk(clk),
 				.rst_n(rst_n),
 				.out(result[i][j])
