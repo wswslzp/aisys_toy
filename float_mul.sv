@@ -3,16 +3,11 @@
 //synopsys translate on
 module float_mul
 (
-	in1, 
-	in2, 
-	clk, 
-	rst_n,
-	result
+	input [31:0] in1, in2,
+	input clk, rst_n,	
+	output [31:0] result,
+	output reg valid
 );
-
-input [31:0] in1, in2;
-input clk, rst_n;
-output [31:0] result;
 
 wire [31:0] in1, in2;
 wire [31:0] result;
@@ -38,7 +33,7 @@ end
 
 assign {sgn1, exp1, mat1} = in1;
 assign {sgn2, exp2, mat2} = in2;
-assign result = {sgn3, exp3, mat3};
+//assign result = {sgn3, exp3, mat3};
 assign m1 = {1'b1, mat1};
 assign m2 = {1'b1, mat2};
 assign result = { sgn3, exp3, mat3 };

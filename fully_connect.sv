@@ -9,7 +9,8 @@ module fully_connect #
 	input wire [31:0] weight[feature_size-1:0][bias_size-1:0],
 	input wire [31:0] bias[bias_size-1:0],
 	input wire clk, rst_n, en,
-	output wire [31:0] result[batch_size-1:0][bias_size-1:0]
+	output wire [31:0] result[batch_size-1:0][bias_size-1:0],
+	output reg result_valid
 );
 
 
@@ -27,6 +28,9 @@ wire [31:0] weight_en[weight_rsize-1:0][weight_csize-1:0];
 //assign weight_en = en ? weight : {(weight_rsize*weight_csize){32'b0}};
 //assign bias_en = en ? bias : {(bias_size){32'b0}};
 //assign bias_tmp = {(batch_size){bias}};
+
+always @(posedge clk) begin
+	if (
 
 generate 
 	genvar i,j;
