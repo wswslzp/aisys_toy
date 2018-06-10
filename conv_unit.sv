@@ -9,6 +9,8 @@ module conv_unit #
 	// from the state control machine
 	input conv_start,
 	output conv_end,
+	input [27:0] conv_init_addr,
+	input conv_init_addr_en,
 	// control from control machine
 	input link_write,
 	input link_read,
@@ -171,6 +173,8 @@ conv_ctrl #
 	.CrbCc_imgEndAddr(CrbCc_imgEndAddr),
 	.CrbCc_initAddrEn(CrbCc_initAddrEn),
 	.CrbCc_initAddr(CrbCc_initAddr),
+	.conv_init_addr(conv_init_addr),
+	.conv_init_addr_en(conv_init_addr_en),
 
 	.conv_start(conv_start),
 	.conv_end(conv_end),

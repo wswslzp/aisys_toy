@@ -13,6 +13,8 @@ module conv_ctrl #
 	// from conv_unit side
 	input conv_start, // the convolution start;
 	output reg conv_end, // the convolution is done;
+	input [27:0] conv_init_addr,
+	input conv_init_addr_en,
 
 	// from conv_wr_ctrl
 	input CwbCc_addrRq,
@@ -22,13 +24,18 @@ module conv_ctrl #
 );
 
 reg [5:0] flt_cnt, cnv_cnt;
+reg [27:0] _conv_init_addr;
 reg [27:0] _ptr, _ptc;
 
 localparam 
-	flt_begin_addr = 28'h800_0000,
 	img_begin_addr = 28'h000_0000;
 
 //assign _ptr = {22'b0, ptr};
+
+always @(posedge clk) begin
+	if (conv_init_addr_en) _conv_init_addr <= conv_init_addr;
+	else ;
+end 
 
 always @(posedge clk, negedge rst_n) begin
 	if (!rst_n) cnv_cnt <= 6'b0;
@@ -49,7 +56,7 @@ always @(posedge clk, negedge rst_n) begin
 	end else if (CrbCc_imgEnd) begin
 		CrbCc_initAddrEn <= 1'b1;
 		if (CrbCc_imgEndAddr[27] == 0) begin
-			CrbCc_initAddr <= flt_begin_addr;
+			CrbCc_initAddr <= _conv_init_addr;
 		end else if (flt_cnt == 6'b111_111) CrbCc_initAddr <= img_begin_addr;
 		else CrbCc_initAddr <= CrbCc_imgEnd + 32/word_len;
 	end else ; 
