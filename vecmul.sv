@@ -3,7 +3,9 @@ module vecmul #
 (
 	input wire [31:0] in1[vsize-1:0], in2[vsize-1:0],
 	input wire clk, rst_n,
-	output wire [31:0] result
+	output reg [31:0] result,
+	output reg done,
+	input en
 );
 
 function int find_add_tree_size(input int kernel_size);
@@ -16,9 +18,38 @@ endfunction
 
 localparam acc_size = (1 << find_add_tree_size(vsize));
 
+reg [31:0] _in1[vsize-1:0], _in2[vsize-1:0];
 wire [31:0] mul_tmp[vsize-1:0];
 wire [31:0] acc_in[acc_size-1:0];
+wire [31:0] acc_out;
 
+always @(posedge clk, negedge rst_n) begin
+	if (!rst_n) begin
+		result <= 0;
+	end else if (result != acc_out) begin
+		result <= acc_out;
+		done <= 1'b1;
+	end else done <= 1'b0;
+end 
+
+generate begin
+	genvar i;
+	for (i = 0; i < vsize; i++) begin
+		always (posedge clk, negedge rst_n) begin
+			if (!rst_n) begin
+				_in1[i] <= 0;
+				_in2[i] <= 0;
+			end else if (!en) begin
+				_in1[i] <= 0;
+				_in2[i] <= 0;
+			end else begin
+				_in1[i] <= in1[i];
+				_in2[i] <= in2[i];
+			end 
+		end
+	end
+end 
+			
 generate
 	genvar i;
 	for (i = 0; i < acc_size; i++) begin : mul_to_acc
@@ -27,8 +58,8 @@ generate
 	end 
 endgenerate
 
-genvar id;
 generate
+	genvar id;
 	for (id = 0; id < vsize; id++) begin : mul
 		float_mul fm
 		(
@@ -47,7 +78,7 @@ float_acc #(
 	.din(acc_in),
 	.clk(clk),
 	.rst_n(rst_n),
-	.dout(result)
+	.dout(acc_out)
 );
 
 
