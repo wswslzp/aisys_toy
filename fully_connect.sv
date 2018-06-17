@@ -8,84 +8,133 @@ module fully_connect #
 	input wire [31:0] data[batch_size-1:0][feature_size-1:0],
 	input wire [31:0] weight[feature_size-1:0][bias_size-1:0],
 	input wire [31:0] bias[bias_size-1:0],
-	input wire clk, rst_n, en,
+	input wire clk, rst_n, data_en, weight_en, bias_en,
 	output wire [31:0] result[batch_size-1:0][bias_size-1:0],
-	output reg result_valid
+	output reg result_valid,
+	output reg bias_rq
 );
-
 
 localparam weight_rsize = feature_size;
 localparam weight_csize = bias_size;
 localparam result_size = bias_size;
 
+reg mul_en, add_en;
 wire [31:0] mul_res[batch_size-1:0][result_size-1:0];
-wire [31:0] bias_en[batch_size-1:0][bias_size-1:0];
-wire [31:0] data_en[batch_size-1:0][feature_size-1:0];
-wire [31:0] weight_en[weight_rsize-1:0][weight_csize-1:0];
-//wire [31:0] bias_en[bias_size-1:0];
+reg [31:0] _bias[batch_size-1:0][bias_size-1:0];
+reg [31:0] _data[batch_size-1:0][feature_size-1:0];
+reg [31:0] _weight[weight_rsize-1:0][weight_csize-1:0];
 reg [31:0] _mul_res[batch_size-1:0][result_size-1:0];
-reg _matmul_valid;
-//reg [31:0] _result[batch_size-1:0][bias_size-1:0];
+wire matmul_done, matadd_done;
 wire [31:0] result_tmp[batch_size-1:0][bias_size-1:0];
 
-//assign data_en = en ? data : {(batch_size*feature_size){32'b0}};
-//assign weight_en = en ? weight : {(weight_rsize*weight_csize){32'b0}};
-//assign bias_en = en ? bias : {(bias_size){32'b0}};
-//assign bias_tmp = {(batch_size){bias}};
+reg [3:0] state, nstate;
 
-always @(posedge clk) begin
-	if (
+always @(posedge clk, negedge rst_n) begin
+	if (!rst_n) state <= 0;
+	else state <= nstate;
+end 
+
+always @(*) begin
+	case (state) 
+		4'h0: nstate = rst_n ? 4'h1 : 4'h0;
+		4'h1: nstate = data_en & weight_en ? 4'h2 : 4'h1; // Data and weight were designed to recieve spontaneously instead sequentially;
+		4'h2: nstate = 4'h3; // After data and weight has been received, make a request signal to 'fc_rd_ctrl' to ask for 'bias';
+		4'h3: nstate = bias_en & matmul_done ? 4'h4 : 4'h3; // When bias input is enable and 'matmul' sends a signal 'matmul_done', the process will go to matrix additon;
+		4'h4: nstate = matadd_done ? 4'h1 : 4'h4;
+		default: nstate = 4'h0;
+	endcase
+end
 
 generate 
 	genvar i,j;
-	for (i = 0; i < batch_size; i++)
-		for (j = 0; j < feature_size; j++) 
-			assign data_en[i][j] = en ? data[i][j] : 32'b0;
-	
-	for (i = 0; i < weight_rsize; i++) 
-		for (j = 0; j < weight_csize; j++) 
-			assign weight_en[i][j] = en ? weight[i][j] : 32'b0;
+	for (i = 0; i < batch_size; i++) begin
+		for (j = 0; j < feature_size; j++) begin
+			always @(posedge clk) begin
+				if (state == 4'h1) begin
+					if (data_en) begin
+						_data[i][j] <= data[i][j];
+					end else ;
+				end else;
+			end 
+		end
+	end
+
+	for (i = 0; i < weight_rsize; i++) begin
+		for (j = 0; j < weight_csize; j++) begin
+			always @(posedge clk) begin
+				if (state == 4'h1) begin
+					if (data_en) begin
+						_weight[i][j] <= weight[i][j];
+					end else ;
+				end else;
+			end 
+		end
+	end
 			
-	for (i = 0; i < batch_size; i++)
-		for (j = 0; j < bias_size; j++)
-			assign bias_en[i][j] = en ? bias[j] : 32'b0;
-	
+	for (i = 0; i < batch_size; i++) begin
+		for (j = 0; j < bias_size; j++) begin
+			always (posedge clk) begin
+				if (state == 4'h3) begin 
+					if (bias_en) begin
+						_bias[i][j] <= bias[i];
+					end else ;
+				end else;
+			end 
+		end
+	end
+
 endgenerate
+
+always @(posedge clk) begin
+	if (state == 4'h2) begin
+		bias_rq <= 1'b1;
+		mul_en <= 1'b1;
+	end else begin
+		bias_rq <= 1'b0;
+		mul_en <= 1'b0;
+	end 
+end 
+
+always @(posedge clk) begin
+	if (state == 4'h3 && mul_done == 1 && bias_en == 1) add_en <= 1'b1;
+	else add_en <= 1'b0;
+end 
 
 matmul #(
 	.left_size(batch_size),
 	.middle_size(feature_size),
 	.right_size(bias_size)
 ) mm (
-	.in1(data_en),
-	.in2(weight_en),
+	.in1(_data),
+	.in2(_weight),
 	.clk(clk),
 	.rst_n(rst_n),
 	.result(mul_res)
+	.en(mul_en),
+	.done(matmul_done)
 );
 
 always @(posedge clk) begin
-	if (_mul_res != mul_res ) begin
+	if (matmul_done) begin
 		_mul_res <= mul_res;
-		_matmul_valid <= 1;
-	end else begin
-		_matmul_valid <= 0;
-	end 
+	end else ;
 end 
 
 matadd #(
 	.rsize(batch_size),
 	.csize(bias_size)
 ) ma (
-	.in1(mul_res),
-	.in2(bias_en & _matmul_valid),
+	.in1(_mul_res),
+	.in2(_bias),
+	.en(add_en),
 	.clk(clk),
 	.rst_n(rst_n),
+	.done(matadd_done),
 	.result(result_tmp)
 );
 					
 always @(posedge clk) begin
-	if (result != result_tmp) begin
+	if (matadd_done) begin
 		result <= result_tmp;
 		result_valid <= 1'b1;
 	end else begin
