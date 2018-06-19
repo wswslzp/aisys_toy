@@ -96,7 +96,7 @@ always @(posedge clk) begin
 end 
 
 always @(posedge clk) begin
-	if (state == 4'h3 && mul_done == 1 && bias_en == 1) add_en <= 1'b1;
+	if (state == 4'h3 && matmul_done == 1 && bias_en == 1) add_en <= 1'b1;
 	else add_en <= 1'b0;
 end 
 

@@ -10,6 +10,8 @@ module fc_rd_ctrl #
 	output reg [batch_size-1:0][feature_size-1:0][31:0] NrcFc_data,
 	output reg [feature_size-1:0][bias_size-1:0][31:0] NrcFc_weight,
 	output reg [bias_size-1:0][31:0] NrcFc_bias,
+	/*Only when these valid signals are all set high, fully-connect layer will
+	* receive the data, weight and bias(fc_unit control the action);*/
 	output reg NrcFc_data_valid, NrcFc_weight_valid, NrcFc_bias_valid,
 	// from bus
 	output reg NrcBus_arvalid,
@@ -178,7 +180,10 @@ always @(posedge clk) begin
 					if (cnt == BIAS_SIZE) begin
 						NrcNc_initAddrRq <= 1'b1;
 						data_type <= 3'b001;
-						NrcFc_bias_valid <= 1'b1;
+						/* The bias valid signal only set high until input bias_rq is high;*/
+						/* Or maybe wait bias, data and weight all to be prepared, then
+						* send to fully-connect layer;*/
+						NrcFc_bias_valid <= 1'b1; 
 						NrcNc_rd_end <= 1'b1;
 					end 
 				end

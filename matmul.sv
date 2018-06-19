@@ -70,7 +70,7 @@ generate begin
 			);
 		end 
 	end 
-	assign done = &_done;
+	assign done = &_done; // done only hold on a clock-perior;
 end 
 endgenerate
 

@@ -28,7 +28,7 @@ always @(posedge clk, negedge rst_n) begin
 		result <= 0;
 	end else if (result != acc_out) begin
 		result <= acc_out;
-		done <= 1'b1;
+		done <= 1'b1; // done only hold on a clock-perior;
 	end else done <= 1'b0;
 end 
 
