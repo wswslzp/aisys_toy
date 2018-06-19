@@ -1,7 +1,7 @@
 module vecmul #
 (parameter vsize = 4)
 (
-	input wire [31:0] in1[vsize-1:0], in2[vsize-1:0],
+	input wire [vsize-1:0][31:0] in1, in2,
 	input wire clk, rst_n,
 	output reg [31:0] result,
 	output reg done,
@@ -18,9 +18,9 @@ endfunction
 
 localparam acc_size = (1 << find_add_tree_size(vsize));
 
-reg [31:0] _in1[vsize-1:0], _in2[vsize-1:0];
-wire [31:0] mul_tmp[vsize-1:0];
-wire [31:0] acc_in[acc_size-1:0];
+reg [vsize-1:0][31:0] _in1, _in2;
+wire [vsize-1:0][31:0] mul_tmp;
+wire [acc_size-1:0][31:0] acc_in;
 wire [31:0] acc_out;
 
 always @(posedge clk, negedge rst_n) begin

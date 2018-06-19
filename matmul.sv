@@ -5,16 +5,16 @@ module matmul #
 	parameter right_size = 4
 )
 (
-	input wire [31:0] in1[left_size-1:0][middle_size-1:0],  
-	input wire [31:0] in2[middle_size-1:0][right_size-1:0], 
+	input wire [left_size-1:0][middle_size-1:0][31:0] in1,  
+	input wire [middle_size-1:0][right_size-1:0][31:0] in2, 
 	input wire clk ,rst_n,                            
-	output wire [31:0] result[left_size-1:0][right_size-1:0]
+	output wire [left_size-1:0][right_size-1:0][31:0] result
 	input en,
 	output done
 );
 
-reg [31:0] _in1[left_size-1:0][middle_size-1:0], _in2[middle_size-1:0][right_size-1:0];  
-wire [31:0] in2_T[right_size-1:0][middle_size-1:0];
+reg [left_size-1:0][middle_size-1:0][31:0] _in1, _in2;  
+wire [right_size-1:0][middle_size-1:0][31:0] in2_T;
 wire [left_size*right_size-1:0] _done;
 
 generate begin

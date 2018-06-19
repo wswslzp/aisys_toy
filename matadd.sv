@@ -4,16 +4,16 @@ module matadd #
 	parameter csize = 3
 )
 (
-	input wire [31:0] in1[rsize-1:0][csize-1:0], in2[rsize-1:0][csize-1:0],
+	input wire [rsize-1:0][csize-1:0][31:0] in1, in2,
 	input wire clk, rst_n,
-	output reg [31:0] result[rsize-1:0][csize-1:0],
+	output reg [rsize-1:0][csize-1:0][31:0] result,
 	input en,
 	output reg done
 );
 
-reg [31:0] _in1[rsize-1:0][csize-1:0], _in2[rsize-1:0][csize-1:0];
+reg [rsize-1:0][csize-1:0][31:0] _in1, _in2;
 reg [rsize*csize-1:0] _done;
-wire [31:0] _result[rsize-1:0][csize-1:0];
+wire [rsize-1:0][csize-1:0][31:0] _result;
 
 always @(*) begin
 	done = &_done;

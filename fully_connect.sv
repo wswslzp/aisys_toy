@@ -5,11 +5,11 @@ module fully_connect #
 	parameter bias_size = 2
 )
 (
-	input wire [31:0] data[batch_size-1:0][feature_size-1:0],
-	input wire [31:0] weight[feature_size-1:0][bias_size-1:0],
-	input wire [31:0] bias[bias_size-1:0],
+	input wire [batch_size-1:0][feature_size-1:0][31:0] data,
+	input wire [feature_size-1:0][bias_size-1:0][31:0] weight,
+	input wire [bias_size-1:0][31:0] bias,
 	input wire clk, rst_n, data_en, weight_en, bias_en,
-	output wire [31:0] result[batch_size-1:0][bias_size-1:0],
+	output wire [batch_size-1:0][bias_size-1:0][31:0] result,
 	output reg result_valid,
 	output reg bias_rq
 );
@@ -19,13 +19,13 @@ localparam weight_csize = bias_size;
 localparam result_size = bias_size;
 
 reg mul_en, add_en;
-wire [31:0] mul_res[batch_size-1:0][result_size-1:0];
-reg [31:0] _bias[batch_size-1:0][bias_size-1:0];
-reg [31:0] _data[batch_size-1:0][feature_size-1:0];
-reg [31:0] _weight[weight_rsize-1:0][weight_csize-1:0];
-reg [31:0] _mul_res[batch_size-1:0][result_size-1:0];
+wire [batch_size-1:0][result_size-1:0][31:0] mul_res;
+reg [batch_size-1:0][bias_size-1:0][31:0] _bias;
+reg [batch_size-1:0][feature_size-1:0][31:0] _data;
+reg [weight_rsize-1:0][weight_csize-1:0][31:0] _weight;
+reg [batch_size-1:0][result_size-1:0][31:0] _mul_res;
 wire matmul_done, matadd_done;
-wire [31:0] result_tmp[batch_size-1:0][bias_size-1:0];
+wire [batch_size-1:0][bias_size-1:0][31:0] result_tmp;
 
 reg [3:0] state, nstate;
 
