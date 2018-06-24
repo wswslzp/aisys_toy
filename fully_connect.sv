@@ -11,7 +11,7 @@ module fully_connect #
 	input wire clk, rst_n, data_en, weight_en, bias_en,
 	output wire [batch_size-1:0][bias_size-1:0][31:0] result,
 	output reg result_valid,
-	output reg bias_rq
+	output reg bias_rq // matmul is done
 );
 
 localparam weight_rsize = feature_size;

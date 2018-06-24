@@ -25,10 +25,11 @@ module fc_rd_ctrl #
 	input BusNrc_rlast,
 	input BusNrc_rid,
 	input [31:0] BusNrc_rdata,
-	// from fully_connect ctrl
+	// from fc_ctrl
 	input [27:0] NcNrc_initAddr,
 	input NcNrc_initAddrEn,
 	output reg NrcNc_initAddrRq,
+	output [2:0] NrcNc_dataType,
 	output reg NrcNc_rd_end
 );
 
@@ -39,7 +40,7 @@ localparam ARID = 4'b1001;
 
 reg [2:0] state, nstate;
 reg [31:0] cnt;
-reg [2:0] data_type;
+reg [2:0] NrcNc_dataType;
 reg [27:0] _addr;
 reg [5:0] rd_cnt;
 reg burst_done;
@@ -49,7 +50,8 @@ task reset;
 	burst_done <= 0;
 	rd_cnt <= 0;
 	_addr <= 0;
-	data_type <= 0;
+	NrcNc_dataType <= 0;
+	NrcNc_initAddrRq <= 0;
 	NrcFc_data <= 0;
 	NrcFc_weight <= 0;
 	NrcBus_aruserid <= 0
@@ -80,7 +82,7 @@ task read_data;
 			burst_done <= 1'b1;
 			rd_cnt <= 0;
 		end else burst_done <= 1'b0;
-		case (data_type) 
+		case (NrcNc_dataType) 
 			3'b001: begin
 				NrcFc_data <= (NrcFc_data << 32) + BusNrc_rdata;
 				rd_cnt <= rd_cnt + 1;
@@ -117,7 +119,7 @@ always @* begin
 		3'h4: begin
 			if (!burst_done) nstate = 3'h4;
 			else begin
-				case (data_type) 
+				case (NrcNc_dataType) 
 					3'b001: nstate = cnt == DATA_SIZE ? 3'h1 : 3'h2;
 					3'b010: nstate = cnt == WEIGHT_SIZE ? 3'h1 : 3'h2;
 					3'b100: nstate = cnt == BIAS_SIZE ? 3'h1 : 3'h2;
@@ -136,7 +138,7 @@ always @(posedge clk) begin
 				reset;
 			end else begin
 				NrcNc_initAddrRq <= 1'b1;
-				data_type <= 3'b001;
+				NrcNc_dataType <= 3'b100;
 			end
 		end 
 
@@ -149,7 +151,7 @@ always @(posedge clk) begin
 
 		3'h2: begin
 			cnt <= cnt + 1;
-			_addr <= _addr + _addr * 16 * 32/word_len; // word_len shoule be 32;
+			_addr <= _addr + cnt * 16 * 32/word_len; // word_len shoule be 32;
 		end 
 
 		3'h3: begin
@@ -159,27 +161,30 @@ always @(posedge clk) begin
 		3'h4: begin
 			NrcBus_arvalid <= 1'b0;
 			read_data;
-			case (data_type) 
+			case (NrcNc_dataType) 
 				3'h001: begin
 					if (cnt == DATA_SIZE) begin
 						NrcNc_initAddrRq <= 1'b1;
-						data_type <= 3'b010;
+						NrcNc_dataType <= 3'b100;
 						NrcFc_data_valid <= 1'b1;
+						cnt <= 0;
 					end else ;
 				end
 				
 				3'b010: begin
 					if (cnt == WEIGHT_SIZE) begin
 						NrcNc_initAddrRq <= 1'b1;
-						data_type <= 3'b100;
+						NrcNc_dataType <= 3'b001;
 						NrcFc_weight_valid <= 1'b1;
+						cnt <= 0;
 					end else;
 				end 
 
 				3'b100: begin
 					if (cnt == BIAS_SIZE) begin
 						NrcNc_initAddrRq <= 1'b1;
-						data_type <= 3'b001;
+						NrcNc_dataType <= 3'b010;
+						cnt <= 0;
 						/* The bias valid signal only set high until input bias_rq is high;*/
 						/* Or maybe wait bias, data and weight all to be prepared, then
 						* send to fully-connect layer;*/
