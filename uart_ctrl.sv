@@ -1,11 +1,14 @@
 module uart_ctrl
 (
+	// from the sys
 	input clk, rst_n, 
+	// from outside uart
 	input rxd, 
+  // from 
 	input ena, // enable the uart_ctrl, remember until uart sent a bit, with 2Mbps!!
 	input wr_sel, // select the mode: write/read
-	input link_read, // read bus switch
-	input link_write, // write bus switch
+	input link_read, // read bus switch ( read from uart to bus )
+	input link_write, // write bus switch ( write to uart from bus )
 	output reg txd, uart_rvalid, uart_wready, // rvalid: flag that means the data from rxd has been sent to the bus. wready: flag that means the data sent an 8bit to txd;
 	inout [31:0] data
 );
@@ -44,7 +47,7 @@ always @(posedge clk, negedge rst_n) begin
 		uart_wready <= 1;
 	end else begin
 		if (ena) begin 
-			if (wr_sel) begin //wr_sel=1, read
+			if (wr_sel) begin //wr_sel=1, read to bus
 				case (rstate) 
 					4'h0: begin
 						rstate <= ~rxd ? 4'h1 : 4'h0;
@@ -63,7 +66,7 @@ always @(posedge clk, negedge rst_n) begin
 					end 
 					default: rstate <= 4'h0;
 				endcase
-			end else begin // wr_sel=0, write
+			end else begin // wr_sel=0, write to outside
 				case (wstate) 
 					4'h0: begin
 						txd <= 1'b1;

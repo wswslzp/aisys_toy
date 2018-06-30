@@ -1,4 +1,4 @@
-module uart_interface #
+module uart_unit #
 (parameter word_size=64*64*64) // e.g. a 64*64 image with 64 channels
 (
 	// from system
