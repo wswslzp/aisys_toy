@@ -23,7 +23,7 @@ module fc_rd_ctrl #
 	input BusNrc_arready,
 	input BusNrc_rvalid,
 	input BusNrc_rlast,
-	input BusNrc_rid,
+	input [3:0] BusNrc_rid,
 	input [31:0] BusNrc_rdata,
 	// from fc_ctrl
 	input [27:0] NcNrc_initAddr,
