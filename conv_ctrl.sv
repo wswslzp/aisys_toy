@@ -33,7 +33,7 @@ localparam
 //assign _ptr = {22'b0, ptr};
 
 always @(posedge clk) begin
-	if (conv_init_addr_en) _conv_init_addr <= conv_init_addr;
+	if (conv_init_addr_en) _conv_init_addr <= conv_init_addr; // filters addresses
 	else ;
 end 
 
