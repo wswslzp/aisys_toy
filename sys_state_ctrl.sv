@@ -25,9 +25,9 @@ reg [15:0] layers;//every 4bits represent a layer group;
 localparam 
 	idle=5'h1,
 	read=5'h2,
-	conv=5'h4,
-	pool=5'h8,
-	write=5'h16;
+	conv=5'h3,
+	pool=5'h4,
+	write=5'h5;
 
 always @(posedge clk, negedge rst_n) begin
 	if (!rst_n) begin
