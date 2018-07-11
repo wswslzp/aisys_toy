@@ -1,13 +1,14 @@
 module conv_ctrl #
 (parameter word_len=32,
- parameter channel_size=64)
+ parameter channel_size=64,
+ parameter img_begin_addr=0)
 (
 	input clk, rst_n,
 	// from the conv_rd_ctrl side
 	input CrbCc_imgEnd, // represent that all pixel of the image is read;
 	input [27:0] CrbCc_imgEndAddr,
-	output reg CrbCc_initAddrEn,
-	output reg [27:0] CrbCc_initAddr,
+	output reg CcCrb_initAddrEn,
+	output reg [27:0] CcCrb_initAddr,
 	input [5:0] ptr, ptc,
 	input pt_en,
 	// from conv_unit side
@@ -27,13 +28,16 @@ reg [5:0] flt_cnt, cnv_cnt;
 reg [27:0] _conv_init_addr;
 reg [27:0] _ptr, _ptc;
 
-localparam 
-	img_begin_addr = 28'h000_0000;
+// the images' prime address is assumed by 28'h0;
+// and the filters' address is determinded by the sys_top, which is waiting to
+// correct;(TODO)
+//localparam 
+	//img_begin_addr = 28'h000_0000;
 
 //assign _ptr = {22'b0, ptr};
 
 always @(posedge clk) begin
-	if (conv_init_addr_en) _conv_init_addr <= conv_init_addr;
+	if (conv_init_addr_en) _conv_init_addr <= conv_init_addr; // filters addresses
 	else ;
 end 
 
@@ -50,16 +54,16 @@ always @(posedge clk, negedge rst_n) begin
 end 
 
 always @(posedge clk, negedge rst_n) begin
-	if (!rst_n || !conv_start) begin
-		CrbCc_initAddr <= img_begin_addr;
-		CrbCc_initAddrEn <= 1'b0;
-	end else if (CrbCc_imgEnd) begin
-		CrbCc_initAddrEn <= 1'b1;
-		if (CrbCc_imgEndAddr[27] == 0) begin
-			CrbCc_initAddr <= _conv_init_addr;
-		end else if (flt_cnt == 6'b111_111) CrbCc_initAddr <= img_begin_addr;
-		else CrbCc_initAddr <= CrbCc_imgEnd + 32/word_len;
-	end else ; 
+	if (!rst_n || !conv_start) begin // system is in reset, all is 0;
+		CcCrb_initAddr <= img_begin_addr;
+		CcCrb_initAddrEn <= 1'b0;
+	end else if (CrbCc_imgEnd) begin // system/pointer has reached the end of the image/filter;
+		CcCrb_initAddrEn <= 1'b1;
+		if (CrbCc_imgEndAddr[27] == 0) begin // if the end of image,
+			CcCrb_initAddr <= _conv_init_addr; // then read the filter;
+		end else if (flt_cnt == 6'b111_111) CcCrb_initAddr <= img_begin_addr; // and if the end of filter and all filters, then read the next image;(6'b111111=64)
+		else CcCrb_initAddr <= CrbCc_imgEnd + 32/word_len; // otherwise it's next filter in the reading line, then just keep reading;
+	end else ;  // system is just begun, and the image is reading to memory;
 end 
 
 always @(posedge clk, negedge rst_n) begin

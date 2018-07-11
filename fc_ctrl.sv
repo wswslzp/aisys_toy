@@ -50,7 +50,10 @@ always @(posedge clk) begin
 	case (state) 
 		2'h0: begin
 			if (!rst_n || !fc_en) begin
-				reset;
+				//reset;
+				NcNrc_initAddr <= 0;
+				NcNrc_initAddrEn <= 0;
+				j
 			end
 		end
 		2'h1: begin

@@ -49,11 +49,8 @@ wire [bias_size-1:0][31:0] NrcFc_bias;
 wire [batch_size-1:0][bias_size-1:0][31:0] FcNwc_result;
 wire [3:0] BusNrc_rid, BusNwc_wuser_id, NrcBus_arlen, NrcBus_aruserid,NwcBus_awuser_id, NwcBus_awlen, NwcBus_wstrb;
 wire [2:0] NrcNc_dataType;
-wire NrcNc_initAddrRq, NrcNc_rd_end, BusNrc_rlast, BusNrc_rvalid, BusNrc_arready, NcNrc_initAddrEn, FcNwc_result_en, BusNwc_wready, BusNwc_wuser_last, BusNwc_awready, NcNwc_initAddrEn, NrcFc_data_valid, NrcFc_weight_valid, NrcFc_bias_valid,  NcNrc_initAddrEn, NcNwc_initAddrEn, NwcNc_done, fc_end, NrcFc_data_valid, NrcFc_bias_valid, NrcFc_weight_valid, NrcBus_arvalid, NrcBus_aruserap, NrcNc_rd_end, NrcNc_initAddrRq, NwcBus_awuser_ap, NwcBus_awvalid, NwcNc_done, FcNwc_result_en;
+wire NrcNc_initAddrRq, NrcNc_rd_end, BusNrc_rlast, BusNrc_rvalid, BusNrc_arready, NcNrc_initAddrEn, FcNwc_result_en, BusNwc_wready, BusNwc_wuser_last, BusNwc_awready, NcNwc_initAddrEn, NrcFc_data_valid, NrcFc_weight_valid, NrcFc_bias_valid,  NwcNc_done, fc_end, NrcBus_arvalid, NrcBus_aruserap, NwcBus_awuser_ap, NwcBus_awvalid;
 
-//assign data = link_write ? NwcBus_wdata : 32'hzzzz_zzzz;
-//assign 
-//assign j = link_read ? k : l;
 
 assign BusNwc_wuser_last = link_read ? wuser_last : 1'hz;
 assign BusNwc_wuser_id = link_read ? wuser_id : 4'hz;
@@ -73,6 +70,12 @@ assign awuser_ap = link_write ? NwcBus_awuser_ap : 1'hz;
 assign awuser_id = link_write ? NwcBus_awuser_id : 4'hz;
 assign awlen = link_write ? NwcBus_awlen : 4'hz;
 assign awvalid = link_write ? NwcBus_awvalid : 1'hz;
+
+always @* begin
+	if (link_read && NrcBus_arvalid) addr = NrcBus_araddr;
+	else if (link_write && NwcBus_awvalid) addr = NwcBus_awaddr;
+	else addr = 28'hzzz_zzzz;
+end 
 
 fc_ctrl #
 (
@@ -179,8 +182,5 @@ fully_connect #
 	.bias_rq() // not find 
 );
 
-/* TODO :
-* 1 link the data, addr and the control wires to the bus * 
-* 2 declare the inline wires */
 
 endmodule
