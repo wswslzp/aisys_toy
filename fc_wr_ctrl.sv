@@ -45,9 +45,6 @@ task write_addr;
 	NwcBus_awuser_ap <= 1'b1;
 	NwcBus_awuser_id <= AWID;
 endtask
-/**** TODO ****************************
-* task write_data; 
-* a FSM to make write runing correctly;*/ 
 
 task write_data;
 	if (BusNwc_wready) write_en <= 1'b1;
@@ -59,14 +56,17 @@ always @(posedge clk, negedge rst_n) begin
 		if (wd_cnt != 5'h10) begin
 			wd_cnt <= wd_cnt + 1;
 			NwcBus_wdata <= _result[batch_size-1][bias_size];
+			NwcBus_wstrb <= 4'hf;
 			_result <= _result << 32;
 		end 
 		else begin
 			wd_cnt <= 5'b0;
+			NwcBus_wstrb <= 0;
 			NwcBus_wdata <= 0;
 		end 
 	end else begin
 		wd_cnt <= 0;
+		NwcBus_wstrb <= 0;
 		NwcBus_wdata <= 0;
 	end 
 end 

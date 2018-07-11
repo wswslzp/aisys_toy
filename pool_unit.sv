@@ -71,11 +71,9 @@ assign awlen = link_write ? PwbBus_awlen : 4'hz;
 assign awvalid = link_write ? PwbBus_awvalid : 1'hz;
 
 always @* begin
-	if (link_write) begin
-		if (PrbBus_arvalid) addr = PrbBus_araddr;
-		else if (PwbBus_awvalid) addr = PwbBus_awaddr;
-		else addr = 32'hzzzz_zzzz;
-	end else addr = 32'hzzzz_zzzz;
+	if (link_read && PrbBus_arvalid) addr = PrbBus_araddr;
+	else if (link_write && PwbBus_awvalid) addr = PwbBus_awaddr;
+	else addr = 28'hzzz_zzzz;
 end 
 
 maxpool #

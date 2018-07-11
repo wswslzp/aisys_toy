@@ -72,12 +72,11 @@ assign awuser_id = link_write ? CwbBus_awuserId : 4'hz;
 assign awlen = link_write ? CwbBus_awlen : 4'hz;
 assign awvalid = link_write ? CwbBus_awvalid : 1'hz;
 
+// TODO : addr's distribution;
 always @* begin
-	if (link_write) begin
-		if (CrbBus_arvalid) addr = CrbBus_araddr;
-		else if (CwbBus_awvalid) addr = CwbBus_awaddr;
-		else addr = 32'hzzzz_zzzz;
-	end else addr = 32'hzzzz_zzzz;
+	if (link_read && CrbBus_arvalid) addr = CrbBus_araddr;
+	else if (link_write && CwbBus_awvalid) addr = CwbBus_awaddr;
+	else addr = 28'hzzz_zzzz;
 end 
 
 conv_layer #
