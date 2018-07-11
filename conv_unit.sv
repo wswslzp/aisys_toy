@@ -2,14 +2,15 @@ module conv_unit #
 (parameter width = 32,
  parameter window_size = 3,
  parameter channel_size = 64,
- parameter filter_total = 64)
+ parameter filter_total = 64,
+ parameter img_begin_addr=0)
 (
 	// from the system 
 	input clk, rst_n,
 	// from the state control machine
 	input conv_start,
 	output conv_end,
-	input [27:0] conv_init_addr,
+	input [27:0] conv_init_addr,// the every convolution's private memory space;
 	input conv_init_addr_en,
 	// control from control machine
 	input link_write,
@@ -49,7 +50,7 @@ wire BusCwb_wuserLast, BusCwb_wready, BusCwb_awready, BusCrb_rlast,
 	CwbCc_addrRq, pt_en;
 wire [3:0] BusCwb_wuserId, BusCrb_rid, CrbBus_arusrid, CwbBus_awuserId,
 	CrbBus_arlen, CwbBus_awlen, CwbBus_wstrb;
-wire [27:0] CcCwb_primAddr, CrbCc_imgEndAddr, CrbCc_initAddr, CcCrb_initAddr, CrbBus_araddr, 
+wire [27:0] CcCwb_primAddr, CrbCc_imgEndAddr, CcCrb_initAddr, CcCrb_initAddr, CrbBus_araddr, 
 CwbBus_awaddr; 
 wire [5:0]  CcCwb_primAddrBias, CrbCc_ptr, CrbCc_ptc;
 
@@ -122,8 +123,8 @@ conv_rd_ctrl #
 	.CrbCl_conv_flt(CrbCl_conv_flt),
 	.CrbCl_data_en(CrbCl_data_en),
 
-	.CcCrb_initAddrEn(CrbCc_initAddrEn),
-	.CcCrb_initAddr(CrbCc_initAddr),
+	.CcCrb_initAddrEn(CcCrb_initAddrEn),
+	.CcCrb_initAddr(CcCrb_initAddr),
 	.CrbCc_imgEnd(CrbCc_imgEnd),
 	.CrbCc_imgEndAddr(CrbCc_imgEndAddr),
 	.ptr(CrbCc_ptr),
@@ -163,15 +164,16 @@ u_conv_wr_bridge
 conv_ctrl #
 (
 	.word_len(32),
-	.channel_size(channel_size)
+	.channel_size(channel_size),
+	.img_begin_addr(img_begin_addr)
 ) u_conv_ctrl
 (
 	.clk(clk),
 	.rst_n(rst_n),
 	.CrbCc_imgEnd(CrbCc_imgEnd),
 	.CrbCc_imgEndAddr(CrbCc_imgEndAddr),
-	.CrbCc_initAddrEn(CrbCc_initAddrEn),
-	.CrbCc_initAddr(CrbCc_initAddr),
+	.CcCrb_initAddrEn(CcCrb_initAddrEn),
+	.CcCrb_initAddr(CcCrb_initAddr),
 	.conv_init_addr(conv_init_addr),
 	.conv_init_addr_en(conv_init_addr_en),
 

@@ -53,6 +53,9 @@ assign ptr = out_pt_r;
 assign ptc = out_pt_c;
 assign pt_en = out_valid;
 
+// send the address computed by comp_addr to the bus/ddr3,
+// and repeat reading 4 times data with 16 burst len composing of a pixel data
+// with 64 channels;
 conv_rd_bridge 
 #(
 	.channel_size(channel_size),
@@ -78,6 +81,8 @@ conv_rd_bridge
 	.arlen(CrbBus_arlen)
 );
 
+// compute the address based on the position of the point got from comp_nx_pt;
+// the address is added by the initAddr got from conv_ctrl;
 comp_addr #
 (
 	.window_size(window_size),
@@ -96,6 +101,8 @@ comp_addr #
 	.addr_valid(__addr_valid)
 );
 
+// compute the next point position, and indicate if the input image/filter is
+// in the end; 
 comp_nx_pt #
 (.window_size(window_size)) u_comp_nx_pt
 (
@@ -116,6 +123,7 @@ comp_nx_pt #
 
 );
 
+// may change
 always @(posedge clk) begin
 	if (CrbCl_data_en) begin
 		if (CcCrb_initAddr[27] == 0) begin

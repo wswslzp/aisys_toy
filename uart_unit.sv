@@ -1,5 +1,9 @@
 module uart_unit #
-(parameter word_size=64*64*64) // e.g. a 64*64 image with 64 channels
+(parameter kernel_scale=10,
+ parameter weight_scale=10,
+ parameter bias_scale=10,
+ parameter image_scale=10,
+ parameter word_len=32) // e.g. a 64*64 image with 64 channels
 (
 	// from system
 	input clk, rst_n,

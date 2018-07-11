@@ -1,3 +1,4 @@
+// TODO : wait to rewrite!!!!!!!!
 module sys_state_ctrl #
 (parameter layer_def=16'h4444) 
 (
