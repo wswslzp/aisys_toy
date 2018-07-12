@@ -33,28 +33,28 @@ always @(posedge clk, negedge rst_n) begin
 end 
 
 generate
-	genvar i;
-	for (i = 0; i < vsize; i++) begin
+	genvar j;
+	for (j = 0; j < vsize; j++) begin
 		always @(posedge clk, negedge rst_n) begin
 			if (!rst_n) begin
-				_in1[i] <= 0;
-				_in2[i] <= 0;
+				_in1[j] <= 0;
+				_in2[j] <= 0;
 			end else if (!en) begin
-				_in1[i] <= 0;
-				_in2[i] <= 0;
+				_in1[j] <= 0;
+				_in2[j] <= 0;
 			end else begin
-				_in1[i] <= in1[i];
-				_in2[i] <= in2[i];
+				_in1[j] <= in1[j];
+				_in2[j] <= in2[j];
 			end 
 		end
 	end
 endgenerate
 			
 generate
-	genvar i;
-	for (i = 0; i < acc_size; i++) begin : mul_to_acc
-		if (i < vsize) assign acc_in[i] = mul_tmp[i];
-		else assign acc_in[i] = 32'b0;
+	genvar k;
+	for (k = 0; k < acc_size; k++) begin : mul_to_acc
+		if (k < vsize) assign acc_in[k] = mul_tmp[k];
+		else assign acc_in[k] = 32'b0;
 	end 
 endgenerate
 

@@ -14,7 +14,7 @@ module matmul #
 );
 
 reg [left_size-1:0][middle_size-1:0][31:0] _in1;
-reg [middle_size-1:0][right_size-1:0][31:0] _in2;
+reg [middle_size-1:0][right_size-1:0][31:0] _in2;  
 wire [right_size-1:0][middle_size-1:0][31:0] in2_T;
 wire [left_size*right_size-1:0] _done;
 

@@ -1,6 +1,6 @@
 module float_acc #(parameter add_num = 4)
 (
-	input [31:0] din[add_num-1:0],
+	input [add_num-1:0][31:0] din,
 	input clk, rst_n,
 	output wire [31:0] dout
 );
