@@ -9,7 +9,7 @@ module fully_connect #
 	input wire [feature_size-1:0][bias_size-1:0][31:0] weight,
 	input wire [bias_size-1:0][31:0] bias,
 	input wire clk, rst_n, data_en, weight_en, bias_en,
-	output wire [batch_size-1:0][bias_size-1:0][31:0] result,
+	output reg [batch_size-1:0][bias_size-1:0][31:0] result,
 	output reg result_valid,
 	output reg bias_rq // matmul is done
 );
@@ -73,7 +73,7 @@ generate
 			
 	for (i = 0; i < batch_size; i++) begin
 		for (j = 0; j < bias_size; j++) begin
-			always (posedge clk) begin
+			always @(posedge clk) begin
 				if (state == 4'h3) begin 
 					if (bias_en) begin
 						_bias[i][j] <= bias[i];
@@ -109,7 +109,7 @@ matmul #(
 	.in2(_weight),
 	.clk(clk),
 	.rst_n(rst_n),
-	.result(mul_res)
+	.result(mul_res),
 	.en(mul_en),
 	.done(matmul_done)
 );

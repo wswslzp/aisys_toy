@@ -8,12 +8,13 @@ module matmul #
 	input wire [left_size-1:0][middle_size-1:0][31:0] in1,  
 	input wire [middle_size-1:0][right_size-1:0][31:0] in2, 
 	input wire clk ,rst_n,                            
-	output wire [left_size-1:0][right_size-1:0][31:0] result
+	output wire [left_size-1:0][right_size-1:0][31:0] result,
 	input en,
 	output done
 );
 
-reg [left_size-1:0][middle_size-1:0][31:0] _in1, _in2;  
+reg [left_size-1:0][middle_size-1:0][31:0] _in1;
+reg [middle_size-1:0][right_size-1:0][31:0] _in2;
 wire [right_size-1:0][middle_size-1:0][31:0] in2_T;
 wire [left_size*right_size-1:0] _done;
 
@@ -21,7 +22,7 @@ generate begin
 	genvar i, j;
 	for(i = 0; i < left_size; i++) begin
 		for (j = 0; j < middle_size; j++) begin
-			always (posedge clk, negedge rst_n) begin
+			always @(posedge clk, negedge rst_n) begin
 				if (!rst_n || !en) begin
 					_in1[i][j] <= 0;
 				end else begin
@@ -32,7 +33,7 @@ generate begin
 	end 
 	for(i = 0; i < middle_size; i++) begin
 		for(j = 0; j < right_size; j++) begin
-			always (posedge clk, negedge rst_n) begin
+			always @(posedge clk, negedge rst_n) begin
 				if (!rst_n || !en) begin
 					_in2[i][j] <= 0;
 				end else begin
@@ -64,7 +65,7 @@ generate begin
 				.in2(in2_T[j]),
 				.clk(clk),
 				.rst_n(rst_n),
-				.result(result[i][j])
+				.result(result[i][j]),
 				.done(_done),
 				.en(en)
 			);

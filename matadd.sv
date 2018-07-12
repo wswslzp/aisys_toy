@@ -12,7 +12,7 @@ module matadd #
 );
 
 reg [rsize-1:0][csize-1:0][31:0] _in1, _in2;
-reg [rsize*csize-1:0] _done;
+reg [rsize-1:0][csize-1:0] _done;
 wire [rsize-1:0][csize-1:0][31:0] _result;
 
 always @(*) begin
@@ -23,7 +23,7 @@ generate begin
 	genvar i, j;
 	for (i = 0; i < rsize; i++ ) begin
 		for (j = 0; j < csize; j ++ ) begin
-			always (posedge clk, negedge rst_n) begin
+			always @(posedge clk, negedge rst_n) begin
 				if (!rst_n || !en) begin 
 					_in1[i][j] <= 0;
 					_in2[i][j] <= 0;
@@ -34,7 +34,7 @@ generate begin
 				end 
 			end 
 			
-			always (posedge clk, negedge rst_n) begin
+			always @(posedge clk) begin
 				if (_result[i][j] != result[i][j]) begin
 					result[i][j] <= _result[i][j];
 					_done[i][j] <= 1'b1;

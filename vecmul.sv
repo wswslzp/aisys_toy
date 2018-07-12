@@ -32,10 +32,10 @@ always @(posedge clk, negedge rst_n) begin
 	end else done <= 1'b0;
 end 
 
-generate begin
+generate
 	genvar i;
 	for (i = 0; i < vsize; i++) begin
-		always (posedge clk, negedge rst_n) begin
+		always @(posedge clk, negedge rst_n) begin
 			if (!rst_n) begin
 				_in1[i] <= 0;
 				_in2[i] <= 0;
@@ -48,7 +48,7 @@ generate begin
 			end 
 		end
 	end
-end 
+endgenerate
 			
 generate
 	genvar i;
