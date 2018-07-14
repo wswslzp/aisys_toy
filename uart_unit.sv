@@ -9,7 +9,7 @@ module uart_unit #
 	input clk, rst_n,
 	// from sys_state_ctrl
 	input uart_en,
-	input [2:0] UnUc_wr_sel,
+	input [2:0] wr_sel,
 	input link_write,
 	input link_read,
 	output reg rdone, wdone,
@@ -97,7 +97,7 @@ uart_ctrl u_uart_ctrl
 	.UcUb_data_out(UcUb_data_out),//o32
 	.UcUb_data_out_en(UcUb_data_out_en),//o1
 	.UbUc_data_in_en(UbUc_data_in_en),//i1
-	.UnUc_wr_sel(UnUc_wr_sel),//i3
+	.UnUc_wr_sel(wr_sel),//i3
 	.UcUn_txd_valid(UcUn_txd_valid),//o1
 	.UcUn_rxd_ready(UcUn_rxd_ready)//o1
 );
@@ -141,7 +141,7 @@ uart_bridge u_uart_bridge
 	.BusUb_rlast(BusUb_rlast),//i1
 	.BusUb_rvalid(BusUb_rvalid),//i1
 	.BusUb_rdata(BusUb_rdata),//i32
-	.UnUc_wr_sel(UnUc_wr_sel),//i1
+	.UnUc_wr_sel(wr_sel),//i1
 	.UnUb_initAddr(UnUb_initAddr),//i28
 	.UnUb_initAddrEn(UnUb_initAddrEn)//i1
 );

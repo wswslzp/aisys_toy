@@ -1,0 +1,21 @@
+
+Starting:    D:\PDS_2018.1B-patch1\syn\bin64\mbin\synplify.exe
+Install:     D:\PDS_2018.1B-patch1\syn
+Hostname:    9R1GSE8FGUOXC9T
+Date:        Sat Jul 14 22:21:08 2018
+Version:     M-2017.03P-SP1
+
+Arguments:   -product synplify_pro -licensetype synplifypro_pango -tcl C:/Users/Administrator.9R1GSE8FGUOXC9T/Desktop/pgt180h_aisys/impl/conv_unit_tech.tcl
+ProductType: synplify_pro
+
+License checkout: synplifypro_pango
+License: synplifypro_pango node-locked 
+Licensed Vendor: pango
+
+Running in Vendor Mode
+
+
+auto_infer_blackbox is not supported in current product.
+01251TCL script complete: "C:/Users/Administrator.9R1GSE8FGUOXC9T/Desktop/pgt180h_aisys/impl/conv_unit_tech.tcl"
+1251exit status=0
+License checkin: synplifypro_pango

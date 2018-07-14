@@ -161,7 +161,7 @@ always @(posedge clk) begin
 			NrcBus_arvalid <= 1'b0;
 			read_data;
 			case (NrcNc_dataType) 
-				3'h001: begin
+				3'b001: begin
 					if (cnt == DATA_SIZE) begin
 						NrcNc_initAddrRq <= 1'b1;
 						NrcNc_dataType <= 3'b100;
