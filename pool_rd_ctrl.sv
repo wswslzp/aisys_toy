@@ -45,6 +45,7 @@ reg in_en;
 wire pool_in_valid;
 reg [1:0] pool_in_buf_cnt;
 reg [4*channel_size*32-1:0] pool_in_buf;
+wire out_valid;
 
 assign ptr = out_pt_r;
 assign ptc = out_pt_c;

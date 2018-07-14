@@ -10,7 +10,7 @@ module fc_unit #
 	input fc_start,
 	output reg fc_end,
 	// from bus 
-	inout [width-1:0] data,
+	inout [word_len-1:0] data,
 	output reg [27:0] addr,
 	// control from control machine
 	input link_write,
@@ -22,7 +22,7 @@ module fc_unit #
 	input awready,
 	input awvalid,
 	// wdata
-	output [width/8-1:0] wstrb,
+	output [word_len/8-1:0] wstrb,
 	input wready,
 	input [3:0] wuser_id,
 	input wuser_last,
@@ -42,14 +42,14 @@ localparam data_init_addr = 28'b0,
 
 // wire declaration
 wire [27:0] NcNrc_initAddr, NrcBus_araddr, NwcBus_awaddr, NcNwc_initAddr;
-wire [31:0] BusNrc_rdata, NwcBus_wdata, 
+wire [31:0] BusNrc_rdata, NwcBus_wdata;
 wire [bias_size-1:0][feature_size-1:0][31:0] NrcFc_data;
 wire [feature_size-1:0][bias_size-1:0][31:0] NrcFc_weight;
 wire [bias_size-1:0][31:0] NrcFc_bias;
 wire [batch_size-1:0][bias_size-1:0][31:0] FcNwc_result;
 wire [3:0] BusNrc_rid, BusNwc_wuser_id, NrcBus_arlen, NrcBus_aruserid,NwcBus_awuser_id, NwcBus_awlen, NwcBus_wstrb;
 wire [2:0] NrcNc_dataType;
-wire NrcNc_initAddrRq, NrcNc_rd_end, BusNrc_rlast, BusNrc_rvalid, BusNrc_arready, NcNrc_initAddrEn, FcNwc_result_en, BusNwc_wready, BusNwc_wuser_last, BusNwc_awready, NcNwc_initAddrEn, NrcFc_data_valid, NrcFc_weight_valid, NrcFc_bias_valid,  NwcNc_done, fc_end, NrcBus_arvalid, NrcBus_aruserap, NwcBus_awuser_ap, NwcBus_awvalid;
+wire NrcNc_initAddrRq, NrcNc_rd_end, BusNrc_rlast, BusNrc_rvalid, BusNrc_arready, NcNrc_initAddrEn, FcNwc_result_en, BusNwc_wready, BusNwc_wuser_last, BusNwc_awready, NcNwc_initAddrEn, NrcFc_data_valid, NrcFc_weight_valid, NrcFc_bias_valid,  NwcNc_done, NrcBus_arvalid, NrcBus_aruserap, NwcBus_awuser_ap, NwcBus_awvalid;
 
 
 assign BusNwc_wuser_last = link_read ? wuser_last : 1'hz;
@@ -81,7 +81,7 @@ fc_ctrl #
 (
 	.data_init_addr(data_init_addr),
 	.weight_init_addr(weight_init_addr),
-	.bias_init_addr(bias_init_addr),
+	.bias_init_addr(bias_init_addr)
 ) u_fc_ctrl
 (
 	.clk(clk),
@@ -132,7 +132,7 @@ fc_rd_ctrl #
 	.NcNrc_initAddrEn(NcNrc_initAddrEn),//i1 
 	.NrcNc_rd_end(NrcNc_rd_end),//o1 
 	.NrcNc_dataType(NrcNc_dataType),//o3 
-	.NrcNc_initAddrRq(NrcNc_initAddrRq),//o1 
+	.NrcNc_initAddrRq(NrcNc_initAddrRq)//o1 
 );
 
 fc_wr_ctrl #

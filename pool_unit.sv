@@ -45,10 +45,10 @@ wire [31:0] BusPrb_rdata, PwbBus_wdata;
 wire result_en;
 wire BusPwb_wuserLast, BusPwb_wready, BusPwb_awready, BusPrb_rlast,
 	BusPrb_arready, BusPrb_rvalid, PcPrb_initAddrEn, PcPwb_primAddrEn,
-	PwbPc_addrRq,PrbPc_pt_en;
+	PwbPc_addrRq,PrbPc_pt_en, PrbBus_arvalid, PrbBus_aruserap, PwbBus_userAp, PwbBus_awvalid;
 wire [3:0] BusPwb_wuserId, BusPrb_rid, PrbBus_arusrid, PwbBus_awuserId,
 	PrbBus_arlen, PwbBus_awlen, PwbBus_wstrb;
-wire [27:0] PcPwb_primAddr, PrbPc_imgEndAddr, PcPrb_initAddr, PcPrb_initAddr, PrbBus_araddr, PwbBus_awaddr; 
+wire [27:0] PcPwb_primAddr, PrbPc_imgEndAddr, PcPrb_initAddr, PrbBus_araddr, PwbBus_awaddr; 
 wire [5:0]  PcPwb_primAddrBias, PrbPc_ptr,PrbPc_ptc;
 
 assign BusPwb_wuserLast = link_read ? wuser_last : 1'hz;

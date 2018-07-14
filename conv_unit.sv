@@ -47,10 +47,10 @@ wire [31:0] result, BusCrb_rdata, CwbBus_wdata;
 wire result_en;
 wire BusCwb_wuserLast, BusCwb_wready, BusCwb_awready, BusCrb_rlast,
 	BusCrb_arready, BusCrb_rvalid, CcCrb_initAddrEn, CcCwb_primAddrEn,
-	CwbCc_addrRq, pt_en;
+	CwbCc_addrRq, pt_en, CrbBus_arvalid, CrbBus_aruserap, CwbBus_userAp, CwbBus_awvalid;
 wire [3:0] BusCwb_wuserId, BusCrb_rid, CrbBus_arusrid, CwbBus_awuserId,
 	CrbBus_arlen, CwbBus_awlen, CwbBus_wstrb;
-wire [27:0] CcCwb_primAddr, CrbCc_imgEndAddr, CcCrb_initAddr, CcCrb_initAddr, CrbBus_araddr, 
+wire [27:0] CcCwb_primAddr, CrbCc_imgEndAddr, CcCrb_initAddr, CrbBus_araddr, 
 CwbBus_awaddr; 
 wire [5:0]  CcCwb_primAddrBias, CrbCc_ptr, CrbCc_ptc;
 

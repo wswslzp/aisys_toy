@@ -1,11 +1,10 @@
 module maxpooling_2(
-  input in1,in2,clk,rst_n,en, 
+  input [31:0] in1,in2,
+	input clk,rst_n,en, 
 	output reg [31:0] max_out,
 	output reg valid
 );
 
-wire [31:0] in1,in2;
-wire [31:0] max_out;
 wire sgn1,sgn2;
 wire [7:0] exp1,exp2;
 wire [22:0] mat1,mat2;

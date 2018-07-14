@@ -29,7 +29,7 @@ module fc_rd_ctrl #
 	input [27:0] NcNrc_initAddr,
 	input NcNrc_initAddrEn,
 	output reg NrcNc_initAddrRq,
-	output [2:0] NrcNc_dataType,
+	output reg [2:0] NrcNc_dataType,
 	output reg NrcNc_rd_end
 );
 
@@ -40,7 +40,6 @@ localparam ARID = 4'b1001;
 
 reg [2:0] state, nstate;
 reg [31:0] cnt;
-reg [2:0] NrcNc_dataType;
 reg [27:0] _addr;
 reg [5:0] rd_cnt;
 reg burst_done;
@@ -54,7 +53,7 @@ task reset;
 	NrcNc_initAddrRq <= 0;
 	NrcFc_data <= 0;
 	NrcFc_weight <= 0;
-	NrcBus_aruserid <= 0
+	NrcBus_aruserid <= 0;
 	NrcBus_arlen <= 0;
 	NrcFc_bias <= 0;
 	NrcBus_aruserap <= 0;

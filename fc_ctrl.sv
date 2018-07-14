@@ -53,7 +53,6 @@ always @(posedge clk) begin
 				//reset;
 				NcNrc_initAddr <= 0;
 				NcNrc_initAddrEn <= 0;
-				j
 			end
 		end
 		2'h1: begin

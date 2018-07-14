@@ -41,13 +41,13 @@ wire [5:0] out_pt_r, out_pt_c;
 wire [3:0] out_pt_bias;
 reg [5:0] out_img_edge;
 wire img_end;
-wire last_pt;
 reg ca_rst_n, cnp_rst_n;
 reg [5:0] in_pt_r, in_pt_c;
 reg [3:0] in_pt_bias;
 reg [5:0] in_img_edge;
 wire [channel_size*32-1:0] conv_in;
 reg in_en;
+wire out_valid;
 
 assign ptr = out_pt_r;
 assign ptc = out_pt_c;

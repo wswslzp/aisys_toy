@@ -36,7 +36,7 @@ module uart_bridge #
 	input BusUb_rvalid,
 	input [31:0] BusUb_rdata,
 	// from uart_unit
-	input [2:0] UnUb_wr_sel
+	input [2:0] UnUb_wr_sel,
 	input [27:0] UnUb_initAddr,
 	input UnUb_initAddrEn
 );
@@ -47,12 +47,7 @@ reg [3:0] state, nstate;
 reg [27:0] _addr;
 reg wd_done;
 reg [31:0] _data;
-
-always @(posedge clk, negedge rst_n) begin
-	if (!rst_n) _addr <= 0;
-	else if (UnUb_initAddrEn) _addr <= UnUb_initAddr;
-	else _addr <= _addr + 32/word_len;//addr plus one unit
-end
+reg write_en;
 
 task write_addr;
 	UbBus_awlen <= 4'h1;// every time write one word
@@ -67,20 +62,9 @@ task write_data;
 	else write_en <= 1'b0;
 endtask
 
-always @(posedge clk) begin
-	if (write_en) begin
-		UbBus_wdata <= _data;
-		UbBus_wstrb <= 4'hf;
-		wd_done <= 1;
-	end else begin
-		UbBus_wstrb <= 0;
-		wd_done <= 0;
-		UbBus_wdata <= 0;
-	end 
-end 
 
 task read_addr;
-	UbBus_aruserid <= ARID;
+	UbBus_aruserid <= AWID;
 	UbBus_arlen <= 4'h0;
 	UbBus_aruserap <= 1'b1;
 	UbBus_araddr <= _addr + 32/word_len;
@@ -93,6 +77,25 @@ task read_data;
 		UbUc_UbUc_data_out_en <= 1'b1;
 	end
 endtask 
+
+always @(posedge clk, negedge rst_n) begin
+	if (!rst_n) _addr <= 0;
+	else if (UnUb_initAddrEn) _addr <= UnUb_initAddr;
+	else _addr <= _addr + 32/word_len;//addr plus one unit
+end
+
+
+always @(posedge clk) begin
+	if (write_en) begin
+		UbBus_wdata <= _data;
+		UbBus_wstrb <= 4'hf;
+		wd_done <= 1;
+	end else begin
+		UbBus_wstrb <= 0;
+		wd_done <= 0;
+		UbBus_wdata <= 0;
+	end 
+end 
 
 always @(posedge clk, negedge rst_n) begin
 	if (!rst_n) state <= 0;

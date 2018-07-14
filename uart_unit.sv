@@ -12,17 +12,17 @@ module uart_unit #
 	input [2:0] UnUc_wr_sel,
 	input link_write,
 	input link_read,
-	output rdone, wdone,
+	output reg rdone, wdone,
 	// from bus 
-	inout [31:0] data;
-	output [27:0] addr;
+	inout [31:0] data,
+	output reg [27:0] addr,
 	// read
 	input arready,
 	//output [27:0] araddr,
-	output aruserap,
-	output [3:0] aruserid,
-	output [3:0] arlen,
-	output arvalid,
+	output reg aruserap,
+	output reg [3:0] aruserid,
+	output reg [3:0] arlen,
+	output reg arvalid,
 	
 	input [3:0] rid,
 	input rlast,
@@ -31,25 +31,25 @@ module uart_unit #
 	// write 
 	input awready,
 	//output [27:0] awaddr,
-	output awuserap,
-	output [3:0] awuserid,
-	output [3:0] awlen,
-	output awvalid,
+	output reg awuserap,
+	output reg [3:0] awuserid,
+	output reg [3:0] awlen,
+	output reg awvalid,
 
 	input wready, 
 	input [3:0] wuserid,
 	input wlast,
 	//output [27:0] wdata,
-	output wstrb
+	output reg wstrb,
 	// from outside
 	input rxd,
-	output txd
+	output reg txd
 );
 
 reg clki;
 reg [3:0] state, nstate;
 wire [32:0] UbUc_data_in, BusUb_rdata, UcUb_data_out, UbBus_wdata;
-wire [27:0] UnUb_initAddr, ,UbBus_awaddr, UbBus_araddr;
+wire [27:0] UnUb_initAddr, UbBus_awaddr, UbBus_araddr;
 wire [3:0] BusUb_wuserid, BusUb_wready, BusUb_rid, UbBus_awuserid, UbBus_awlen, UbBus_aruserid, UbBus_arlen, UbBus_wstrb;
 wire UckUc_clk_bps, UckUc_clk_smp, UckUc_txd_ena, UckUc_rxd_ena, UbUc_data_in_en, BusUb_awready, BusUb_arready, BusUb_wlast, BusUb_rlast, BusUb_rvalid, UnUb_initAddrEn, UcUb_data_out_en, UcUn_txd_valid, UcUn_rxd_ready, UbBus_awuserap, UbBus_awvalid, UbBus_aruserap, UbBus_arvalid; 
 
@@ -143,13 +143,13 @@ uart_bridge u_uart_bridge
 	.BusUb_rdata(BusUb_rdata),//i32
 	.UnUc_wr_sel(UnUc_wr_sel),//i1
 	.UnUb_initAddr(UnUb_initAddr),//i28
-	.UnUb_initAddrEn(UnUb_initAddrEn),//i1
+	.UnUb_initAddrEn(UnUb_initAddrEn)//i1
 );
 
 // TODO : IO complete flag;
-reg cnt
-always @(posedge clk, negedge rst_n) begin
-	if (!rst_n) 
+//reg cnt
+//always @(posedge clk, negedge rst_n) begin
+//	if (!rst_n) 
 
 
 endmodule 

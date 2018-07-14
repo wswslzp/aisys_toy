@@ -3,7 +3,7 @@ module uart_ctrl
 	// from outside 
 	input clk, rst_n,
 	input rxd,
-	output txd,
+	output reg txd,
 	// from uart_clkgen
 	input UckUc_clk_bps,
 	input UckUc_clk_smp,
@@ -27,6 +27,7 @@ reg [2:0] t_cnt;
 reg [3:0] r_cnt, bit_cnt, data_cnt;
 reg t0, t1, neg, rxd_start;
 reg frame_end;
+reg [7:0] txd_buf;
 
 always @(posedge clk, negedge rst_n) begin
 	if (~rst_n) state <= 2'h0;
@@ -74,7 +75,7 @@ always @* begin
 end
 
 task send;
-	case (tstate) 
+	case (wstate) 
 		4'h0: begin 
 			txd <= 0;
 			frame_end <= 0;
@@ -83,7 +84,7 @@ task send;
 			txd <= txd_buf[7];
 			txd_buf <= txd_buf << 1;
 		end 
-		4'h10: begin
+		4'h9: begin
 			txd <= 1;
 			frame_end <= 1;
 		end 
@@ -112,7 +113,7 @@ end
 
 // Code below about rxd
 always @(posedge UckUc_clk_smp, negedge rst_n) begin
-	if (!rst_n) begin rstate <= 0;
+	if (!rst_n) rstate <= 0;
 	else begin
 		if (state != 2'h2) rstate <= 0;
 		else rstate <= nrstate;

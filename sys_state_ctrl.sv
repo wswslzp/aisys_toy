@@ -4,11 +4,11 @@ module sys_state_ctrl #
 (
 	// from outside 
 	input clk, rst_n,
-	output reg system_end
+	output reg system_end,
 	
 	// uart side
 	output reg uart_done,
-	input uart_wrSel,
+	output reg uart_wrSel,
 	output reg uart_en,
 	output reg wrsel,
 	
@@ -44,7 +44,7 @@ always @* begin
 		read: nstate = uart_done ? conv : read;
 		conv: begin
 			if (!conv_done) nstate = conv;
-			else if (conv_end && layers[3:0] < layer_def[3:0]) nstate = conv;
+			else if (conv_done && layers[3:0] < layer_def[3:0]) nstate = conv;
 			else nstate = pool;
 		end 
 		pool: begin
@@ -66,16 +66,16 @@ always @(posedge clk) begin
 			uart_wrSel <= 1;
 			system_end <= 1'b0;
 		end 
-		read: if (uart_valid) begin
+		read: if (uart_done) begin
 			conv_en <= 1;
 			uart_en <= 1'b0;
 			pool_en <= 1'b0;
 		end 
 		conv: if (conv_done) begin
 			if (layers[3:0] < layer_def[3:0]) begin
-				layers[3:0] <= layer[3:0] + 1;
-				conv_init_addr <= flt_beg_addr[27:0];
-				conv_init_addr_en <= 1;
+				layers[3:0] <= layers[3:0] + 1;
+				//conv_init_addr <= flt_beg_addr[27:0];
+				//conv_init_addr_en <= 1;
 			end else begin
 				layers <= {layers[11:0], 4'b0};
 				conv_en <= 1'b0;
@@ -96,7 +96,7 @@ always @(posedge clk) begin
 		write: if (uart_done) begin
 			system_end <= 1'b1;
 		end 
-	end case
+	endcase
 end 
 
 endmodule

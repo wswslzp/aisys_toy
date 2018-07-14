@@ -5,11 +5,11 @@ module conv_layer #
 	parameter filter_total = 8
 )
 (
-	input wire [31:0] img_window[window_size-1:0][window_size-1:0][channel_size-1:0],
-	input wire [31:0] filters[filter_total-1:0][window_size-1:0][window_size-1:0][channel_size-1:0],
+	input wire [window_size-1:0][window_size-1:0][channel_size-1:0][31:0] img_window,
+	input wire [filter_total-1:0][window_size-1:0][window_size-1:0][channel_size-1:0][31:0] filters,
 	input wire clk, rst_n,
 	input wire  en, // when en == 0, all result == 0!
-	output wire [31:0] conv_outs[filter_total-1:0],
+	output wire [filter_total-1:0][31:0] conv_outs,
 	output reg conv_outs_valid
 );
 

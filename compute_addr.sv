@@ -17,8 +17,8 @@ reg [1:0] bias_m, bias_d;
 generate 
 if (window_size == 2) begin
 	always @* begin
-		bias_m = bias % 2;
-		bias_d = bias / 2;
+		bias_m = pt_bias % 2;
+		bias_d = pt_bias / 2;
 	end 
 end
 endgenerate
